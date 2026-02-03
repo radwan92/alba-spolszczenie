@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Alba.Spolszczenie</AssemblyName>
+    <Version>0.0.1</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+    <RootNamespace>Alba.Spolszczenie</RootNamespace>
+    <AlbaDir Condition="'$(AlbaDir)' == ''">C:\Program Files\Epic Games\AlbaAWildlifeAdventusiuFk</AlbaDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2019.4.40" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="com.unity-common.game-text">
+      <HintPath>$(AlbaDir)\Alba_Data\Managed\com.unity-common.game-text.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="com.unity-common.core">
+      <HintPath>$(AlbaDir)\Alba_Data\Managed\com.unity-common.core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="'$(CopyToGame)' == 'true'">
+    <ItemGroup>
+      <InjectionFiles Include="$(ProjectDir)Injection\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(InjectionFiles)" DestinationFolder="$(AlbaDir)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AlbaDir)\BepInEx\plugins" />
+    <Copy SourceFiles="$(ProjectDir)alba.pl.jsonl" DestinationFolder="$(AlbaDir)" />
+  </Target>
+</Project>
